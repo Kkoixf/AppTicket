@@ -1,0 +1,7 @@
+{
+  "name": "AppITicket",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
