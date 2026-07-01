@@ -1,19 +1,52 @@
 import { Injectable } from '@angular/core';
 
+interface User {
+  email: string;
+  password: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly STORAGE_KEY = 'admin_logged_in';
+  private readonly USERS_KEY = 'admin_users';
 
-  // Teste de login com email e senha fixos
-  private readonly ADMIN_EMAIL = 'admin';
-  private readonly ADMIN_PASSWORD = 'admin';
+  constructor() {
+  
+    if (!localStorage.getItem(this.USERS_KEY)) {
+      const defaultUser: User = { email: 'admin@evento.com', password: 'admin123' };
+      localStorage.setItem(this.USERS_KEY, JSON.stringify([defaultUser]));
+    }
+  }
+
+  private getUsers(): User[] {
+    const raw = localStorage.getItem(this.USERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }
+
+  private saveUsers(users: User[]): void {
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+  }
+
+  register(email: string, password: string): { success: boolean; message: string } {
+    const normalizedEmail = email.trim().toLowerCase();
+    const users = this.getUsers();
+
+    if (users.some(u => u.email === normalizedEmail)) {
+      return { success: false, message: 'Este e-mail já está cadastrado.' };
+    }
+
+    users.push({ email: normalizedEmail, password });
+    this.saveUsers(users);
+
+    return { success: true, message: 'Cadastro realizado com sucesso! Faça login.' };
+  }
 
   login(email: string, password: string): boolean {
-    const isValid =
-      email.trim().toLowerCase() === this.ADMIN_EMAIL &&
-      password === this.ADMIN_PASSWORD;
+    const normalizedEmail = email.trim().toLowerCase();
+    const users = this.getUsers();
+    const isValid = users.some(u => u.email === normalizedEmail && u.password === password);
 
     if (isValid) {
       localStorage.setItem(this.STORAGE_KEY, 'true');

@@ -16,9 +16,9 @@ import {
 import { AuthService } from '../services/auth.services';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+  selector: 'app-register',
+  templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
   standalone: true,
   imports: [
     IonContent, IonHeader, IonTitle, IonToolbar,
@@ -26,10 +26,11 @@ import { AuthService } from '../services/auth.services';
     CommonModule, FormsModule
   ]
 })
-export class LoginPage {
+export class RegisterPage {
 
   email: string = '';
   password: string = '';
+  confirmPassword: string = '';
   loading: boolean = false;
 
   constructor(
@@ -38,30 +39,40 @@ export class LoginPage {
     private alertController: AlertController
   ) {}
 
-  async onLogin() {
-    if (!this.email || !this.password) {
-      await this.showAlert('Preencha e-mail e senha.');
+  async onRegister() {
+    if (!this.email || !this.password || !this.confirmPassword) {
+      await this.showAlert('Preencha todos os campos.');
+      return;
+    }
+
+    if (this.password !== this.confirmPassword) {
+      await this.showAlert('As senhas não coincidem.');
+      return;
+    }
+
+    if (this.password.length < 6) {
+      await this.showAlert('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
     this.loading = true;
-    const success = this.authService.login(this.email, this.password);
+    const result = this.authService.register(this.email, this.password);
     this.loading = false;
 
-    if (success) {
-      this.router.navigateByUrl('/tabs/checkin');
-    } else {
-      await this.showAlert('E-mail ou senha inválidos.');
+    await this.showAlert(result.message);
+
+    if (result.success) {
+      this.router.navigateByUrl('/login');
     }
   }
 
-  goToRegister() {
-    this.router.navigateByUrl('/register');
+  goToLogin() {
+    this.router.navigateByUrl('/login');
   }
 
   private async showAlert(message: string) {
     const alert = await this.alertController.create({
-      header: 'Erro',
+      header: 'Aviso',
       message,
       buttons: ['OK']
     });
