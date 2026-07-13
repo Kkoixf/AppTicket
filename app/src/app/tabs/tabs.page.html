@@ -10,6 +10,8 @@
       <ion-label>Check-in</ion-label>
     </ion-tab-button>
 
+    <ion-tab-button class="tab-button-placeholder" disabled="true"></ion-tab-button>
+
     <ion-tab-button tab="relatorio" href="/tabs/relatorio">
       <ion-icon aria-hidden="true" name="square"></ion-icon>
       <ion-label>Relatório</ion-label>
@@ -22,3 +24,9 @@
 
   </ion-tab-bar>
 </ion-tabs>
+
+<ion-fab vertical="bottom" horizontal="center" slot="fixed">
+  <ion-fab-button (click)="scanQRCode()" color="primary">
+  <ion-icon name="qr-code-outline"></ion-icon>
+  </ion-fab-button>
+  </ion-fab>
